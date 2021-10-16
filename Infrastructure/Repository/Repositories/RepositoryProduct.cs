@@ -6,5 +6,6 @@ namespace Infrastructure.Repository.Repositories
 {
     public class RepositoryProduct : RepositoryGenerics<Product>, IProduct
     {
+
     }
 }
