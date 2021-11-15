@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces;
 using Entities.Entities;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,17 +11,20 @@ namespace Web.IByPower.UI.Controllers
     [Authorize]
     public class ProductsController : Controller
     {
+        public readonly UserManager<ApplicationUser> _userManager;
         private readonly IInterfaceProduct _IInterfaceProduct;
-        public ProductsController(IInterfaceProduct IInterfaceProduct)
+        public ProductsController(IInterfaceProduct IInterfaceProduct, UserManager<ApplicationUser> userManager)
         {
             _IInterfaceProduct = IInterfaceProduct;
+            _userManager = userManager;
         }
 
         // GET: ProductsController
         public async Task<IActionResult> Index()
         {
+            var idUser = await ReturnIdUserLogged();
 
-            return View(await _IInterfaceProduct.List());
+            return View(await _IInterfaceProduct.ListProductsOfUser(idUser));
         }
 
         // GET: ProductsController/Details/5
@@ -42,6 +46,10 @@ namespace Web.IByPower.UI.Controllers
         {
             try
             {
+                var idUser = await ReturnIdUserLogged();
+
+                product.UserId = idUser;
+
                 await _IInterfaceProduct.AddProduct(product);
                 if (product.Notifications.Any())
                 {
@@ -50,13 +58,13 @@ namespace Web.IByPower.UI.Controllers
                         ModelState.AddModelError(item.NameProperty, item.Message);
                     }
 
-                    return View("Edit", product);
+                    return View("Create", product);
                 }
 
             }
             catch
             {
-                return View("Edit", product);
+                return View("Create", product);
             }
 
             return RedirectToAction(nameof(Index));
@@ -118,6 +126,13 @@ namespace Web.IByPower.UI.Controllers
             {
                 return View();
             }
+        }
+
+        private async Task<string> ReturnIdUserLogged()
+        {
+            var idUser = await _userManager.GetUserAsync(User);
+
+            return idUser.Id;
         }
     }
 }

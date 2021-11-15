@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Configuration
 {
-    public class ContextBase : IdentityDbContext<IdentityUser>
+    public class ContextBase : IdentityDbContext<ApplicationUser>
     {
         public ContextBase( DbContextOptions<ContextBase> options) : base(options)
         {                
@@ -13,7 +13,7 @@ namespace Infrastructure.Configuration
 
         public DbSet<Product> Product { get; set; }
         public DbSet<UserBuys> UserBuys { get; set; }
-        public DbSet<IdentityUser> IdentityUser { get; set; }
+        public DbSet<ApplicationUser> ApplicationUser { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -26,7 +26,7 @@ namespace Infrastructure.Configuration
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.Entity<IdentityUser>().ToTable("AspNetUsers").HasKey(x => x.Id);
+            builder.Entity<ApplicationUser>().ToTable("AspNetUsers").HasKey(x => x.Id);
 
             base.OnModelCreating(builder); 
         }
